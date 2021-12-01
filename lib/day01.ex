@@ -13,31 +13,15 @@
 # limitations under the License.
 
 defmodule Aoc2021.Day01 do
-  def tail1([a, b | tail ], acc) do
-    tmp = if a < b do acc+1 else acc end
-    tail1([ b | tail ], tmp)
-  end
-
-  def tail1(_ , acc) do
-    acc
-  end
-
   def part1(args) do
-    args |> Enum.map(&String.to_integer/1)
-         |> tail1(0)
-  end
-
-  def tail2([a, b, c, d | tail ], acc) do
-    tmp = if a < d do acc+1 else acc end
-    tail2([ b, c, d | tail ], tmp)
-  end
-
-  def tail2(_ , acc) do
-    acc
+    list = Enum.map(args, &String.to_integer/1)
+    [ _ | tail ] = list
+    Enum.zip(tail, list) |> Enum.reduce(0, fn {a,b},c -> if a>b do c+1 else c end end)
   end
 
   def part2(args) do
     args |> Enum.map(&String.to_integer/1)
-         |> tail2(0)
+         |> Enum.chunk_every(4,1,:discard)
+         |> Enum.reduce(0, fn [a,_,_,b],c -> if b>a do c+1 else c end end)
   end
 end
