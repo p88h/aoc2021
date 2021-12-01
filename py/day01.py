@@ -16,7 +16,11 @@ import pygame
 import math
 
 pygame.init()
-win = pygame.display.set_mode((1920, 1080))
+W = 1920
+H = 1080
+S = 10
+B = W // S
+win = pygame.display.set_mode((W, H))
 pygame.display.set_caption("AOC")
 
 run = True
@@ -26,8 +30,9 @@ with open("../input/day01.txt") as f:
 ofs = 0
 clock = pygame.time.Clock()
 PI = math.pi
-a = min(hmap[0:192])
-h = 340 + hmap[50] - a
+hover = H//2 - 200
+a = min(hmap[0:B])
+h = hover + hmap[50] - a
 anim = False
 
 while run:
@@ -35,37 +40,39 @@ while run:
         if event.type == pygame.QUIT:
             run = False
     keys=pygame.key.get_pressed()
+    if keys[pygame.K_RETURN]:
+        anim = True
     if keys[pygame.K_SPACE]:
-        anim = not anim
+        anim = False
 
     win.fill((0, 0, 0))
-    b = min(hmap[ofs:ofs+192])
+    b = min(hmap[ofs:ofs+B])
     if b > a + 6:
         b = a + 6
     if b < a:
         b = a
     a = b
-    if h - (hmap[ofs+50] - a) > 348:
+    if h - (hmap[ofs+50] - a) > hover + 8:
         h -= 2
-    if h - (hmap[ofs+50] - a) < 332:
+    if h - (hmap[ofs+50] - a) < hover - 8:
         h += 2
-    for p in range(1,192):
-        x0 = 10*(p-1)
-        y0 = 1080-(hmap[ofs+p-1]-a)
-        x1 = 10*p
-        y1 = 1080-(hmap[ofs+p]-a)
+    for p in range(1,B):
+        x0 = S*(p-1)
+        y0 = H-(hmap[ofs+p-1]-a)
+        x1 = S*p
+        y1 = H-(hmap[ofs+p]-a)
         c = (140,140,140)
         if y1 < y0 and p > 20 and p < 80:
             c = (160,255,160)
         pygame.draw.line(win, c, (x0, y0), (x1, y1) )
-    pygame.draw.arc(win, (240,180,180), [120,1080-h-20,40,20],0,2*PI,2)
+    pygame.draw.arc(win, (240,180,180), [120,H-h-20,40,20],0,2*PI,2)
     for l in range(4):
         dim = 5*((ofs+16-l*4)%16)
-        pygame.draw.arc(win, (180-dim,240-dim,240-dim), [124+l*8,1080-h-12,5,5],0,2*PI,4)
+        pygame.draw.arc(win, (180-dim,240-dim,240-dim), [124+l*8,H-h-12,5,5],0,2*PI,4)
     for r in range(16):
         b = r*r+(ofs%16)
-        pygame.draw.arc(win, (160-r*10,255-r*10,160-r*10),[160,1080-h,b,b], 3*PI/2, 2*PI)
-    if anim and ofs + 192 < len(hmap):
+        pygame.draw.arc(win, (160-r*10,255-r*10,160-r*10),[160,H-h,b,b], 3*PI/2, 2*PI)
+    if anim and ofs + B < len(hmap):
         ofs = ofs + 1
 
     pygame.display.update()
