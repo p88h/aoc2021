@@ -16,8 +16,14 @@ defmodule Mix.Tasks.Main do
   use Mix.Task
   @shortdoc "Advent of Code Runner"
   @spec run(any) :: any
-  def run(_args) do
-    day = "01" # TODO: parametrize this ?
+  def run(args) do
+    day = if length(args) > 0 do
+      # Use provided day number (needs to be 0-prefixed just like modules and files are)
+      hd(args)
+    else
+      # Figure out the last day based on input files
+      tl(Path.wildcard("input/day*.txt")) |> Path.basename() |> Path.rootname() |> String.slice(-2,2)
+    end
     module = String.to_existing_atom("Elixir.Aoc2021.Day#{day}")
     file = File.open!("input/day#{day}.txt", [:read, :utf8])
     input = IO.read(file, :all ) |> String.split("\n")
