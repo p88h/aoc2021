@@ -27,3 +27,7 @@ aoc2021-*.tar
 /tmp
 
 /.vscode/
+
+__pycache__/
+
+/*.mp4

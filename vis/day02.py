@@ -13,62 +13,37 @@
 # limitations under the License.
 
 import pygame
-import ffmpeg
-import glob,os
+import os
+from common import View, Controller
 
-pygame.init()
-W = 1920
-H = 1080
-S = 1
-win = pygame.display.set_mode((W, H))
-pygame.display.set_caption("AOC")
+class Background:
+    def __init__(self, base_path) -> None:
+        self.pos = (0, 0)
+        with open(base_path + "/input/day02.txt") as f:
+            self.lines = f.read().splitlines()
 
-run = True
-lines = []
-file_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-with open(file_path + "/input/day02.txt") as f:
-    lines = f.read().splitlines()
-idx = 0
-(x0, y0) = (0, 0)
-clock = pygame.time.Clock()
-anim = False
-win.fill((0, 0, 0))
-pygame.event.clear()
+    def update(self, view, controller):
+        if view.frame >= len(self.lines) - 1:
+            controller.animate = False
 
-while run:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_RETURN:
-                anim = True
-            if event.key ==  pygame.K_SPACE:
-                anim = False
-            if event.key == pygame.K_ESCAPE:
-                run = False
-    
-    if anim and idx < len(lines):
-        l = lines[idx].split()
+        idx = view.frame
+        l = self.lines[idx].split()
         v = int(l[1])
-        (x1, y1) = (x0, y0)
+        (x0, y0) = self.pos
+        (x1, y1) = self.pos
         if l[0] == "forward":
             x1 += v
         if l[0] == "down":
             y1 += v
         if l[0] == "up":
             y1 -= v
-        pygame.draw.line(win, (180,180,240), (x0 // S , y0 // S), (x1 // S, y1 // S), 2)
-        (x0, y0) = (x1, y1)
-        idx += 1
-        pygame.image.save(win, "{}/snaps/{:04}.jpg".format(file_path, idx))
+        pygame.draw.line(view.win, (180,180,240), (x0 , y0), (x1, y1), 2)
+        self.pos = (x1, y1)
 
-    pygame.display.update()
-    clock.tick(60)
-
-pygame.quit()
-snaps = "{}/snaps/*.jpg".format(file_path)
-print("Now saving video")
-ffmpeg.input(snaps, pattern_type='glob', framerate=60).output('day02.mp4').run()
-print("Cleaning up snaps")
-for f in glob.glob(snaps):
-    os.remove(f)
+view = View()
+view.setup("Day 02")
+controller = Controller()
+my_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+view.record(my_dir + "/day2.mp4")
+controller.add(Background(my_dir))
+controller.run(view)
