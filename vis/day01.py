@@ -18,7 +18,7 @@ import os
 from common import View,Controller
 
 class Background:
-    def __init__(self, base_path, view, scale = 10) -> None:
+    def __init__(self, base_path, view, scale = 10):
         self.blocks = view.width // scale 
         self.center = 2 * view.height // 3
         self.scale = scale
@@ -51,7 +51,7 @@ class Background:
             pygame.draw.line(view.win, color, (x0, y0), (x1, y1) , width)
         
 class UBoot:
-    def __init__(self, bg) -> None:
+    def __init__(self, bg):
         self.background = bg
         self.hover = bg.base - bg.hmap[10]
         pass

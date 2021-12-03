@@ -17,7 +17,7 @@ import os
 from common import View, Controller
 
 class Background:
-    def __init__(self, base_path) -> None:
+    def __init__(self, base_path):
         self.pos = (0, 0)
         with open(base_path + "/input/day02.txt") as f:
             self.lines = f.read().splitlines()
