@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import pygame
+import pygame.freetype
 import os
 from common import View, Controller
 
@@ -22,6 +23,8 @@ class Dataset:
         self.idx = 0
         self.bit = 0
         self.filtered = []
+        self.mode = 1
+        self.dcnt = { "0": 0, "1": 0 }
         with open(base_path + "/input/day03.txt") as f:
             self.lines = f.read().splitlines()
         self.major = self.majority()
@@ -34,13 +37,16 @@ class Dataset:
         y = 32+py*S*13
         return (x, y)
 
-    def paint(self, view, item, pos):
-        (x, y) = self.bbox(view, pos)
-        for j in range(len(item)):
+    def paint(self, view, item, pos, sel = (255, 255, 255)):
+        (x, y) = self.bbox(view, pos)        
+        for j in range(len(item)):            
+            col = (255, 255, 255)
+            if j == self.bit:
+                col = sel
             if item[j] == "0":
-                pygame.draw.rect(view.win, (255, 255, 255), (x, y + j * 8, 6, 6), 1)
+                pygame.draw.rect(view.win, col, (x, y + j * 8, 6, 6), 1)
             else:
-                pygame.draw.rect(view.win, (255, 255, 255), (x, y + j * 8, 6, 6), 0)
+                pygame.draw.rect(view.win, col, (x, y + j * 8, 6, 6), 0)
 
     def majority(self):
         d = {"0": 0, "1": 0}
@@ -48,10 +54,37 @@ class Dataset:
             d[item[self.bit]] += 1
         return "0" if d["0"] > d["1"] else "1"
 
+    def legend(self, view):
+        (x, y) = self.bbox(view, 0)
+        text = "{:3d}     {:3d}".format(self.dcnt["0"], self.dcnt["1"])
+        pygame.draw.rect(view.win, (255,255,255), (x + 32, y - 14, 6, 6), 1)
+        pygame.draw.rect(view.win, (255,255,255), (x + 96, y - 14, 6, 6), 0)
+        view.font.render_to(view.win, (x,y - 16), text, (255, 255, 255))
+
     def update(self, view, controller):
         if self.bit == 12:
             controller.animate = False
             return
+        if self.mode == 1:
+            view.win.fill((0, 0, 0))
+            for i in range(self.idx):
+                self.paint(view, self.lines[i], i, (160,160,240))
+            for i in range(self.idx, self.idx+4):
+                if i < len(self.lines):
+                    self.dcnt[self.lines[i][self.bit]] += 1
+                    self.paint(view, self.lines[i], i, (160,240,160))
+            for i in range(self.idx+4, len(self.lines)):
+                self.paint(view, self.lines[i], i)
+            self.legend(view)
+            if not controller.animate:
+                return
+            self.idx += 4
+            if self.idx >= len(self.lines):
+                self.idx = 0
+                self.mode = 2
+                self.major = self.majority()
+            return            
+
         view.win.fill((0, 0, 0))
         fl = len(self.filtered)
         for i in range(fl):
@@ -62,22 +95,26 @@ class Dataset:
         pygame.draw.line(view.win, (255, 255, 255), (x, y+3), (x+3, y+6), 2)
         for i in range(self.idx, len(self.lines)):
             self.paint(view, self.lines[i], i-self.idx+fl+1)
+        self.legend(view)
         if not controller.animate:
             return
         if self.idx < len(self.lines):
-            if self.lines[self.idx][self.bit] == self.major:
-                self.filtered.append(self.lines[self.idx])
+            item = self.lines[self.idx]
+            if item[self.bit] == self.major:
+                self.filtered.append(item)
+            else:
+                self.dcnt[item[self.bit]] -= 1
             self.idx += 1
         else:
             self.lines = self.filtered
             self.filtered = []
             self.idx = 0
-            self.bit += 1
-            if self.bit < 11:
-                self.major = self.majority()
+            self.bit += 1            
+            self.mode = 1
+            self.dcnt = { "0": 0, "1": 0 }
 
 
-view = View(1280, 720, 40)
+view = View(1280, 800, 60)
 view.setup("Day 03")
 controller = Controller()
 my_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
