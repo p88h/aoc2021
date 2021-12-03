@@ -77,10 +77,10 @@ class Dataset:
                 self.major = self.majority()
 
 
-view = View(1280, 800, 30)
+view = View(1280, 720, 40)
 view.setup("Day 03")
 controller = Controller()
 my_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-# view.record(my_dir + "/day2.mp4")
+view.record(my_dir + "/day3.mp4")
 controller.add(Dataset(my_dir))
 controller.run(view)

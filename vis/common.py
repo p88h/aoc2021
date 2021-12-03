@@ -55,7 +55,7 @@ class View:
             return
         print("Now saving video")
         snaps = "{}/frame_*.jpg".format(self.tmp_path)
-        ffmpeg.input(snaps, pattern_type='glob', framerate=60).output(self.output_path).run()
+        ffmpeg.input(snaps, pattern_type='glob', framerate=self.fps).output(self.output_path).run()
         print("Cleaning up snaps")
         for f in glob.glob(snaps):
             os.remove(f)
