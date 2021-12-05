@@ -43,11 +43,17 @@ class Painter:
 
 def init(my_dir, controller):
     with open(my_dir + "/input/day05.txt") as f:
-        lines = []
+        lines1 = []
+        lines2 = []
         for line in f.read().splitlines():
             line = line.replace(" -> ", ",")
-            lines.append(tuple(map(int, line.split(","))))
-        controller.add(Painter(lines))
+            (x0, y0, x1, y1) = tuple(map(int, line.split(",")))
+            if x0 == x1 or y0 == y1:
+                lines1.append((x0, y0, x1, y1))
+            else:
+                lines2.append((x0, y0, x1, y1))
+        lines1.extend(lines2)
+        controller.add(Painter(lines1))
 
 view = View(1000, 1000, 15)
 view.setup("Day 05")
