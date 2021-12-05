@@ -21,15 +21,10 @@ defmodule Aoc2021.Day05 do
   def next(a, a), do: a
   def next(a, b), do: if a < b, do: a + 1, else: a - 1
 
-  def plot([a, b, a, b], l), do: [ {a,b} | l ]
-  def plot([a, b, c, d], l), do: plot([next(a, c), next(b, d), c, d ], [ {a, b} | l ])
+  def plot([a, b, a, b], map), do: Map.update(map, {a, b}, 1, fn v -> v + 1 end)
+  def plot([a, b, c, d], map), do: plot([next(a, c), next(b, d), c, d ], plot([a, b, a, b], map))
 
-  def dups([], acc), do: length(acc)
-  def dups([ a | tail], acc = [ a | _ ]), do: dups(tail, acc)
-  def dups([ a , a | tail ], acc), do: dups(tail, [ a | acc ])
-  def dups([ _ | tail ], acc), do: dups(tail, acc)
-
-  def solve(l), do: Enum.reduce(l, [], &plot/2) |> Enum.sort() |> dups([])
+  def solve(l), do: Enum.reduce(l, %{}, &plot/2) |> Enum.count(fn {_,v} -> v > 1 end)
 
   def part1(args), do: parse(args) |> Enum.filter(fn [a,b,c,d] -> a == c or b == d end) |> solve()
   def part2(args), do: parse(args) |> solve()
