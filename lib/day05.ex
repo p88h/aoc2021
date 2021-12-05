@@ -18,22 +18,19 @@ defmodule Aoc2021.Day05 do
          |> Enum.map(fn x -> String.split(x, ",") |> Enum.map(&String.to_integer/1) end)
   end
 
+  def next(a, a), do: a
   def next(a, b), do: if a < b, do: a + 1, else: a - 1
 
-  def plotf([a, b, c, d], l) when a == c, do: plotf([a, next(b,d), c, d], [ {a, b} | l ])
-  def plotf([a, b, c, d], l) when b == d, do: plotf([next(a,c), b, c, d], [ {a, b} | l ])
-  def plotf(_, l), do: l
-
-  def plot([a, b, c, d], l) when a != c and b != d, do: plot([next(a, c), next(b, d), c, d ], [ {a, b} | l ])
-  def plot(p, l), do: plotf(p, l)
+  def plot([a, b, a, b], l), do: [ {a,b} | l ]
+  def plot([a, b, c, d], l), do: plot([next(a, c), next(b, d), c, d ], [ {a, b} | l ])
 
   def dups([], acc), do: length(acc)
   def dups([ a | tail], acc = [ a | _ ]), do: dups(tail, acc)
   def dups([ a , a | tail ], acc), do: dups(tail, [ a | acc ])
   def dups([ _ | tail ], acc), do: dups(tail, acc)
 
-  def solve(l, pf), do: Enum.map(l, fn x -> pf.(x, []) end) |> List.flatten() |> Enum.sort() |> dups([])
+  def solve(l), do: Enum.reduce(l, [], &plot/2) |> Enum.sort() |> dups([])
 
-  def part1(args), do: parse(args) |> solve(&plotf/2)
-  def part2(args), do: parse(args) |> solve(&plot/2)
+  def part1(args), do: parse(args) |> Enum.filter(fn [a,b,c,d] -> a == c or b == d end) |> solve()
+  def part2(args), do: parse(args) |> solve()
 end

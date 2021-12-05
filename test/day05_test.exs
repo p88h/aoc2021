@@ -37,6 +37,6 @@ defmodule Day05Test do
   end
 
   test "part 2" do
-    assert part2(input()) == nil
+    assert part2(input()) == 12
   end
 end
