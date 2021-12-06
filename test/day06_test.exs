@@ -12,20 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-defmodule Day00Test do
+defmodule Day06Test do
   use ExUnit.Case
-  doctest Aoc2021.Day00
-  import Aoc2021.Day00
+  doctest Aoc2021.Day06
+  import Aoc2021.Day06
 
   def input do
     [ "3,4,3,1,2" ]
   end
 
   test "part 1" do
-    assert part1(input()) == 80
+    assert part1(input()) == 5934
   end
 
   test "part 2" do
-    assert part2(input()) == nil
+    assert part2(input()) == 26984457539
   end
 end
