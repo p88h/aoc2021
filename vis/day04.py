@@ -83,10 +83,10 @@ class Server:
         self.winners = []
 
     def update(self, view, controller):
-        view.win.fill((0,0,0))
         if view.frame % 10 == 0:
             if self.idx == len(self.cards):
                 controller.animate = False
+                return
             if len(self.anim) == 4:
                 self.anim.pop()
             self.anim.insert(0, self.cards[self.idx])
@@ -94,6 +94,7 @@ class Server:
             for player in self.players:
                 player.mark(self.cards[self.idx], self)
             self.idx += 1
+        view.win.fill((0,0,0))
         (x, y) = self.pos
         view.font.render_to(view.win, (x, y), "Mark:", (255, 255, 255))
         x += 20
