@@ -32,6 +32,7 @@ class View:
         self.win = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption(title)
         self.font = pygame.freetype.SysFont('Courier', 14)
+        self.font.origin = True
         self.clock = pygame.time.Clock()
         self.win.fill((0, 0, 0))
 
