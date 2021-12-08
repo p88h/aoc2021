@@ -17,6 +17,8 @@ from pygame import gfxdraw as gd
 import math
 import os
 from common import View, Controller
+import numpy as np
+from numpy.polynomial import polynomial as poly
 
 class Painter:
     def __init__(self, points):
@@ -53,6 +55,23 @@ class Painter:
         self.thist.append(th)
         self.ehist.append(eh)
         m1 = 0
+
+        if len(self.ehist) > 5:
+            minv = 1600000*1000
+            minp = 0
+            for tx in range(self.a, self.b):
+                v = min(max(0, int(self.epoly(tx))), 1600000*1000)
+                if v < minv:
+                    minv = v
+                    minp = tx                    
+                dh = v // 1600000
+                gd.pixel(view.win, ofs+tx, pos+dh, (160, 80, 80))
+            dh = minv // 1600000
+            (x, y) = (ofs+minp, pos+dh)
+            if c < minp:
+                pygame.draw.circle(view.win, (160,160,160), (x, y), 4, 1)
+            view.font.render_to(view.win, (x-24, y+6), "EST[2]: {}@{}".format(minv,minp), (240, 120, 120))
+
         for i in range(len(self.thist)):
             dh = self.thist[i] // 4000
             gd.pixel(view.win, ofs+i, pos+dh, (160, 255, 160))
@@ -60,7 +79,7 @@ class Painter:
                 m1 = i
         (x, y) = (ofs+m1, pos+ self.thist[m1] // 4000)
         pygame.draw.circle(view.win, (240,240,240), (x, y), 4, 1)
-        view.font.render_to(view.win, (x-24,y-24), "MIN[1]: {}".format(self.thist[m1]), (160, 255, 160))
+        view.font.render_to(view.win, (x-24,y-24), "MIN[1]: {}@{}".format(self.thist[m1],m1), (160, 255, 160))
 
         m2 = 0
         for i in range(len(self.ehist)):
@@ -70,7 +89,12 @@ class Painter:
                 m2 = i
         (x, y) = (ofs+m2, pos+self.ehist[m2] // 1600000)
         pygame.draw.circle(view.win, (240,240,240), (x, y), 4, 1)
-        view.font.render_to(view.win, (x-24,y-24), "MIN[2]: {}".format(self.ehist[m2]), (255, 160, 160))
+        view.font.render_to(view.win, (x-24,y-24), "MIN[2]: {}@{}".format(self.ehist[m2],m2), (255, 160, 160))
+
+        if len(self.ehist) == 5:
+            ax = np.array(range(5))
+            ay = np.array(self.ehist)
+            self.epoly = np.poly1d(np.polyfit(ax, ay, deg=2))
 
 
 def init(my_dir, controller):
