@@ -70,7 +70,7 @@ class Painter:
             (x, y) = (ofs+minp, pos+dh)
             if c < minp:
                 pygame.draw.circle(view.win, (160,160,160), (x, y), 4, 1)
-            view.font.render_to(view.win, (x-24, y+6), "EST[2]: {}@{}".format(minv,minp), (240, 120, 120))
+            view.font.render_to(view.win, (x-24, y+14), "EST[2]: {}@{}".format(minv,minp), (240, 120, 120))
 
         for i in range(len(self.thist)):
             dh = self.thist[i] // 4000
@@ -79,7 +79,7 @@ class Painter:
                 m1 = i
         (x, y) = (ofs+m1, pos+ self.thist[m1] // 4000)
         pygame.draw.circle(view.win, (240,240,240), (x, y), 4, 1)
-        view.font.render_to(view.win, (x-24,y-24), "MIN[1]: {}@{}".format(self.thist[m1],m1), (160, 255, 160))
+        view.font.render_to(view.win, (x-24,y-16), "MIN[1]: {}@{}".format(self.thist[m1],m1), (160, 255, 160))
 
         m2 = 0
         for i in range(len(self.ehist)):
@@ -89,7 +89,7 @@ class Painter:
                 m2 = i
         (x, y) = (ofs+m2, pos+self.ehist[m2] // 1600000)
         pygame.draw.circle(view.win, (240,240,240), (x, y), 4, 1)
-        view.font.render_to(view.win, (x-24,y-24), "MIN[2]: {}@{}".format(self.ehist[m2],m2), (255, 160, 160))
+        view.font.render_to(view.win, (x-24,y-16), "MIN[2]: {}@{}".format(self.ehist[m2],m2), (255, 160, 160))
 
         if len(self.ehist) == 5:
             ax = np.array(range(5))

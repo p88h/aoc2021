@@ -17,7 +17,7 @@ import os
 from common import View, Controller
 
 def bbox(idx):
-    return ( 20 + 160 * (idx % 12), 10 + 120 * (idx // 12) )
+    return ( 20 + 160 * (idx % 12), 18 + 120 * (idx // 12) )
 
 class Player:
     def __init__(self, lines, idx) -> None:
@@ -103,7 +103,7 @@ class Server:
             c = 240 / (i + 1)
             view.font.render_to(view.win, (x, y + (i + 1 ) *16), text, (c, c, c))
         if view.frame % 2 == 0 and view.frame % 10 < 5:
-            pygame.draw.rect(view.win, (255,255,255), (x - 4 , y + 12, 24, 16), 2)
+            pygame.draw.rect(view.win, (255,255,255), (x - 4 , y + 4, 24, 16), 2)
         x += 80
         if len(self.winners) == 0:
             return

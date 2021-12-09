@@ -26,7 +26,7 @@ class Background:
             controller.animate = False
         text = "Day: {} Fish: {}".format(view.frame // 10, len(controller.objects) - 1)
         view.win.fill((0,0,0))
-        view.font.render_to(view.win, (10, 10), text, (255, 255, 255))
+        view.font.render_to(view.win, (10, 16), text, (255, 255, 255))
 
 def rndmod(value, factor, limit):
     (a, b) = limit

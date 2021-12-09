@@ -59,7 +59,7 @@ class Dataset:
         text = "{:3d}     {:3d}".format(self.dcnt["0"], self.dcnt["1"])
         pygame.draw.rect(view.win, (255,255,255), (x + 32, y - 14, 6, 6), 1)
         pygame.draw.rect(view.win, (255,255,255), (x + 96, y - 14, 6, 6), 0)
-        view.font.render_to(view.win, (x,y - 16), text, (255, 255, 255))
+        view.font.render_to(view.win, (x,y-8), text, (255, 255, 255))
 
     def update(self, view, controller):
         if self.bit == 12:
