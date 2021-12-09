@@ -24,10 +24,21 @@ defmodule Mix.Tasks.Main do
       # Figure out the last day based on input files
       tl(Path.wildcard("input/day*.txt")) |> Path.basename() |> Path.rootname() |> String.slice(-2,2)
     end
+
     module = String.to_existing_atom("Elixir.Aoc2021.Day#{day}")
     file = File.open!("input/day#{day}.txt", [:read, :utf8])
-    input = IO.read(file, :all ) |> String.split("\n")
-    input |> module.part1() |> IO.inspect(label: "Part 1:")
-    input |> module.part2() |> IO.inspect(label: "Part 2:")
+    input = IO.read(file, :all) |> String.split("\n")
+
+    Benchee.run(
+      %{
+        "Day #{day} Part 1" => fn -> module.part1(input) end,
+        "Day #{day} Part 2" => fn -> module.part2(input) end
+      },
+      warmup: 1,
+      time: 3
+    )
+
+    module.part1(input) |> IO.inspect(label: "Day #{day} Part 1 result:")
+    module.part2(input) |> IO.inspect(label: "Day #{day} Part 2 result:")
   end
 end
