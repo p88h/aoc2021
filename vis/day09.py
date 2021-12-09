@@ -25,6 +25,7 @@ class Tile:
         self.parent = self
         self.covered = False
         self.color = (100,random.randint(100,240),random.randint(100,240),100)
+        self.done = False
 
     def find(self):
         if self.parent != self:
@@ -57,6 +58,7 @@ class Tile:
         if int(level) > self.height:
             yw = y - int(level) + random.randint(-1,1)
             pygame.draw.polygon(view.win, self.find().color, [(x,yw),(x+9,yw-5),(x+18,yw),(x+9, yw+5)])
+            self.covered = True
 
 class Water:
     def __init__(self):
@@ -69,27 +71,27 @@ class Water:
     def update(self, view, controller):
         view.win.fill((0,0,0,0))
         self.surf.fill((0,0,0,0))
+        merge = 0
         if self.level < 17:
             self.level += 0.1
         else:
-            controller.animate = False
+            merge = 30
         h = len(self.board)
         for y in range(h):
             w = len(self.board[y])
             for x in range(w):
                 tile = self.board[y][x]
-                if tile.height < int(self.level) and not tile.covered:
+                if merge > 0 and tile.covered and not tile.done:
                     if x > 0 and self.board[y][x-1].covered:
                         tile.union(self.board[y][x-1])
                     if y > 0 and self.board[y-1][x].covered:
                         tile.union(self.board[y-1][x])
-                    if x < w - 1 and self.board[y][x+1].covered:
-                        tile.union(self.board[y][x+1])
-                    if y < h - 1 and self.board[y+1][x].covered:
-                        tile.union(self.board[y+1][x])
-                    tile.covered = True
+                    tile.done = True
+                    merge -= 1
                 tile.update(view, self.level)
         view.win.blit(self.surf, (0,0))
+        if merge > 0:
+            controller.animate = False
 
 def init(my_dir, controller):
     water = Water()
@@ -102,7 +104,7 @@ def init(my_dir, controller):
             y += 1
     controller.add(water)        
 
-view = View(1920,1080,30)
+view = View(1920,1080,15)
 view.setup("Day 09")
 controller = Controller()
 my_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
