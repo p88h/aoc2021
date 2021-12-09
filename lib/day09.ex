@@ -55,11 +55,11 @@ defmodule Aoc2021.Day09 do
     map = for i <- 0..h-1, j <- 0..w-1, into: %{}, do: {{i,j}, {i,j}}
     map = Enum.reduce(Map.keys(map), map, fn {i,j}, m ->
       m = if mat[i][j] < 9 and j > 0 and mat[i][j-1] < 9, do: union(m,{i,j}, {i,j-1}), else: m
-      if mat[i][j] < 9 and i > 0 and mat[i-1][j] < 9, do: union(m,{i,j}, {i,j-1}), else: m
+      if mat[i][j] < 9 and i > 0 and mat[i-1][j] < 9, do: union(m,{i,j}, {i-1,j}), else: m
     end)
     map = Enum.reduce(Map.keys(map), map, fn {i,j}, m -> elem(find(m,{i, j}),1) end)
     for i <- 0..h-1, j <- 0..w-1 do
-      if mat[i][j] < 9, do: map[i*w+j], else: -1
+      if mat[i][j] < 9, do: map[{i,j}], else: {-1,-1}
     end |> Enum.frequencies() |> Enum.sort_by(&(-elem(&1,1))) |> top3prod()
   end
 end
