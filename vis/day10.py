@@ -65,7 +65,6 @@ class DotUnit:
                 if segs[i][j] == 0:
                     col = (60, 60, 60)
                 pygame.draw.rect(surface, col, (x0, y0, 3, 3))
-                pygame.draw.line(surface, (0, 0, 0, 0), (x0, y0+3), (x0+3, y0), 1)
 
 
 class DotLine:
