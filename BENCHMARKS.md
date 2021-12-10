@@ -1,3 +1,4 @@
+```
 Compiling 1 file (.ex)
 Operating System: Linux
 CPU Information: Intel(R) Core(TM) i7-8086K CPU @ 4.00GHz
@@ -5,7 +6,9 @@ Number of Available Cores: 12
 Available memory: 15.59 GB
 Elixir 1.12.3
 Erlang 24.1.4
+```
 
+```
 Name                    ips        average  deviation         median         99th %
 Day 01 Part 1       9631.30       0.104 ms    ±30.92%      0.0820 ms       0.166 ms
 Day 01 Part 2       2988.57        0.33 ms    ±39.13%        0.27 ms        0.78 ms
@@ -27,3 +30,4 @@ Day 09 Part 1        167.48        5.97 ms    ±25.33%        5.22 ms        9.3
 Day 09 Part 2         30.46       32.83 ms    ±14.44%       32.35 ms       45.59 ms
 Day 10 Part 1        693.75        1.44 ms    ±29.56%        1.25 ms        2.51 ms
 Day 10 Part 2        670.38        1.49 ms    ±32.12%        1.29 ms        2.71 ms
+```
