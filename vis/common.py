@@ -68,10 +68,13 @@ class Controller:
         self.animate = start_anim
         self.quit = False
         self.objects = []
+        self.clickables = []
         pass
 
-    def add(self, object):
+    def add(self, object, clickable = False):
         self.objects.append(object)
+        if clickable:
+            self.clickables.append(object)
 
     def run(self, view):
         pygame.event.clear()
@@ -84,6 +87,16 @@ class Controller:
                     if event.key == pygame.K_SPACE:
                         self.animate = not self.animate
                     if event.key == pygame.K_ESCAPE:
-                        self.quit = True            
+                        self.quit = True
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    pos = pygame.mouse.get_pos()
+                    for obj in self.clickables:
+                        obj.click(pos, True)
+                if event.type == pygame.MOUSEBUTTONUP:
+                    pos = pygame.mouse.get_pos()
+                    for obj in self.clickables:
+                        obj.click(pos, False)
+
+
         pygame.quit()
         view.finish()        
