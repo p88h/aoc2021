@@ -12,14 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-defmodule Day00Test do
+defmodule Day12Test do
   use ExUnit.Case
-  doctest Aoc2021.Day00
-  import Aoc2021.Day00
+  doctest Aoc2021.Day12
+  import Aoc2021.Day12
 
-  def input1, do: [ "start-A","start-b","A-c","A-b","b-d","A-end","b-end" ]
+  def input1 do
+    [ "start-A",
+      "start-b",
+      "A-c",
+      "A-b",
+      "b-d",
+      "A-end",
+      "b-end" ]
+  end
   def input2 do
-    [ "dc-end",
+  [ "dc-end",
     "HN-start",
     "start-kj",
     "dc-start",
@@ -29,27 +37,27 @@ defmodule Day00Test do
     "kj-sa",
     "kj-HN",
     "kj-dc" ]
+  end
   def input3 do
     [ "fs-end",
-    "he-DX",
-    "fs-he",
-    "start-DX",
-    "pj-DX",
-    "end-zg",
-    "zg-sl",
-    "zg-pj",
-    "pj-he",
-    "RW-he",
-    "fs-DX",
-    "pj-RW",
-    "zg-RW",
-    "start-pj",
-    "he-WI",
-    "zg-he",
-    "pj-fs",
-    "start-RW" ]
+      "he-DX",
+      "fs-he",
+      "start-DX",
+      "pj-DX",
+      "end-zg",
+      "zg-sl",
+      "zg-pj",
+      "pj-he",
+      "RW-he",
+      "fs-DX",
+      "pj-RW",
+      "zg-RW",
+      "start-pj",
+      "he-WI",
+      "zg-he",
+      "pj-fs",
+      "start-RW" ]
   end
-
 
   test "part 1" do
     assert part1(input1()) == 10
@@ -58,6 +66,8 @@ defmodule Day00Test do
   end
 
   test "part 2" do
-    assert part2(input1()) == 0
+    assert part2(input1()) == 36
+    assert part2(input2()) == 103
+    assert part2(input3()) == 3509
   end
 end
