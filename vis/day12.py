@@ -47,6 +47,8 @@ class Cave:
             self.clicked = math.sqrt(math.pow(mx-x,2)+math.pow(my-y,2)) < self.size
     
     def update(self, view, controller):
+        if self.clicked:
+            self.pos = pygame.mouse.get_pos()
         (x, y) = self.pos
         view.win.blit(self.surf, (x - self.size , y - self.size//2))
 
@@ -217,7 +219,8 @@ def init(my_dir, controller, font):
     poses = [(369, 750),(968, 1011),(989, 570),(368, 269),(988, 49),
              (984, 273),(1644, 697),(1643, 936),(1632, 258),(999, 795)]
     for i in range(len(names)):
-        caves[names[i]].pos = poses[i]
+        if names[i] in caves:
+            caves[names[i]].pos = poses[i]
     for c in caves.values():
         controller.add(c, clickable=True)
     visited["start"] = 1
