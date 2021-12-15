@@ -78,7 +78,6 @@ class Board:
         heapq.heapify(self.pq)
 
     def bfsstep(self):
-        npath = []
         st = None
         while not st and self.pq:
             (v, (y, x)) = heapq.heappop(self.pq)
@@ -86,7 +85,7 @@ class Board:
             if st.done:
                 st = None
         if not st:
-            return []
+            return False
         st.done = True
         st.update_block()
         if st.height > self.maxh:
@@ -100,32 +99,35 @@ class Board:
                     dt.prev = st
                     dt.update_block()
                     heapq.heappush(self.pq, (nd, (y+dy, x+dx)))
-        while st.prev:
-            st = st.prev
-            if not st.selected:
-                npath.append(st)
-                st.selected = True
-                st.update_block()
-        return npath
+        return True
 
     def update(self, view, controller):
-        for t in self.path:
-            t.selected = False
-
-        npath = self.bfsstep()
-        if not npath:
+        if not self.bfsstep():
             controller.animate = False
             return
         for i in range(self.maxs):
-            npath.extend(self.bfsstep())
+            self.bfsstep()
+        if self.maxs < 4:
+            self.maxs += 1
 
+        for t in self.path:
+            t.selected = False
+        npath = []
+        for i in self.rn:
+            st = self.tiles[i][i]
+            if st.done:
+                while st.prev:
+                    npath.append(st)
+                    st.selected = True
+                    st.update_block()
+                    st = st.prev
+                break
         for t in self.path:
             if not t.selected:
                 t.update_block()
         self.path = npath
+        print("Path",npath)
 
-        if self.maxs < 4:
-            self.maxs += 1
         view.win.fill((0, 0, 0, 0))
         for (y,x) in itertools.product(self.rn, self.rn):
             self.tiles[y][x].render_block(view.win, self.maxh)
