@@ -16,6 +16,8 @@ import pygame
 import ffmpeg
 import glob
 import os
+import time
+import argparse
 
 
 class View:
@@ -31,20 +33,26 @@ class View:
         pygame.font.init()
         self.win = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption(title)
-        self.font = pygame.freetype.SysFont('Courier', 14)
+        self.font = pygame.freetype.SysFont("Courier", 14)
         self.font.origin = True
         self.clock = pygame.time.Clock()
         self.win.fill((0, 0, 0))
+
+    def snaps(self):
+        return "{}/frame_*.jpg".format(self.tmp_path)
 
     def record(self, output_path):
         self.save = True
         self.output_path = output_path
         self.tmp_path = os.path.dirname(output_path) + "/tmp/"
+        for f in glob.glob(self.snaps()):
+            os.remove(f)
+        print("Recording video to: ", self.output_path)
 
     def render(self, controller):
         for object in controller.objects:
             object.update(self, controller)
-        
+
         pygame.display.update()
         self.clock.tick(self.fps)
 
@@ -60,26 +68,44 @@ class View:
         snaps = "{}/frame_*.jpg".format(self.tmp_path)
         ffmpeg.input(snaps, pattern_type='glob', framerate=self.fps).output(self.output_path).run()
         print("Cleaning up snaps")
-        for f in glob.glob(snaps):
+        for f in glob.glob(self.snaps()):
             os.remove(f)
 
+
 class Controller:
-    def __init__(self, start_anim = True) -> None:
+    def __init__(self, start_anim=True) -> None:
         self.animate = start_anim
         self.quit = False
         self.objects = []
         self.clickables = []
-        pass
+        parser = argparse.ArgumentParser()
+        parser.add_argument("-r", "--rec", help="record movie", action="store_true")
+        self.args = parser.parse_args()
 
-    def add(self, object, clickable = False):
+    def workdir(self):
+        import __main__
+
+        return os.path.dirname(os.path.dirname(os.path.realpath(__main__.__file__)))
+
+    def basename(self):
+        import __main__
+
+        return os.path.splitext(os.path.basename(os.path.realpath(__main__.__file__)))[0]
+
+    def add(self, object, clickable=False):
         self.objects.append(object)
         if clickable:
             self.clickables.append(object)
 
     def run(self, view):
+        if self.args.rec:
+            view.record(os.path.join(self.workdir(), self.basename() + ".mp4"))
         pygame.event.clear()
+        start = time.time()
+        fcnt = 0
         while not self.quit:
             view.render(self)
+            fcnt += 1
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.quit = True
@@ -96,7 +122,11 @@ class Controller:
                     pos = pygame.mouse.get_pos()
                     for obj in self.clickables:
                         obj.click(pos, False)
-
+            delta = time.time() - start
+            if delta >= 3:
+                print("FPS: {:02f}".format(fcnt / delta))
+                fcnt = 0
+                start = time.time()
 
         pygame.quit()
-        view.finish()        
+        view.finish()

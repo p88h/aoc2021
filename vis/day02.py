@@ -13,8 +13,8 @@
 # limitations under the License.
 
 import pygame
-import os
 from common import View, Controller
+
 
 class Background:
     def __init__(self, base_path):
@@ -37,13 +37,12 @@ class Background:
             y1 += v
         if l[0] == "up":
             y1 -= v
-        pygame.draw.line(view.win, (180,180,240), (x0 , y0), (x1, y1), 2)
+        pygame.draw.line(view.win, (180, 180, 240), (x0, y0), (x1, y1), 2)
         self.pos = (x1, y1)
+
 
 view = View()
 view.setup("Day 02")
 controller = Controller()
-my_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-view.record(my_dir + "/day2.mp4")
-controller.add(Background(my_dir))
+controller.add(Background(controller.workdir()))
 controller.run(view)

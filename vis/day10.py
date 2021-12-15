@@ -13,9 +13,7 @@
 # limitations under the License.
 
 import pygame
-import os
 from common import View, Controller
-from functools import reduce
 
 
 class DotFont:
@@ -56,12 +54,12 @@ class DotUnit:
         (x, y) = self.pos
         for i in range(len(segs)):
             for j in range(len(segs[i])):
-                (x0, y0) = (x + 4*j, y + 4*i)
+                (x0, y0) = (x + 4 * j, y + 4 * i)
                 if hl:
-                    col = (180,255,180) if hd<0 else (160,160,240)
-                    col = (255,180,180) if hd==0 else col
+                    col = (180, 255, 180) if hd < 0 else (160, 160, 240)
+                    col = (255, 180, 180) if hd == 0 else col
                 else:
-                    col = (160,160,40)
+                    col = (160, 160, 40)
                 if segs[i][j] == 0:
                     col = (60, 60, 60)
                 pygame.draw.rect(surface, col, (x0, y0, 3, 3))
@@ -71,7 +69,7 @@ class DotLine:
     def __init__(self, font, pos):
         (x, y) = pos
         self.ofs = y
-        self.units = [DotUnit(font, (x + i*17, 0)) for i in range(110)]
+        self.units = [DotUnit(font, (x + i * 17, 0)) for i in range(110)]
         self.tmp = pygame.Surface((1920, 20))
         self.ready = False
 
@@ -104,55 +102,51 @@ class Solver:
         self.cw = 0
         self.cnt = True
         self.mt = {"(": ")", "[": "]", "{": "}", "<": ">"}
-        self.z1 = {")" : 3, "]" : 57, "}" : 1197, ">" : 25137}
-        self.z2 = {"(" : 1, "[" : 2, "{" : 3, "<" : 4}
-
+        self.z1 = {")": 3, "]": 57, "}": 1197, ">": 25137}
+        self.z2 = {"(": 1, "[": 2, "{": 3, "<": 4}
 
     def update(self, view, controller):
         if self.cw == len(self.words):
             controller.animate = False
             return
-        view.win.fill((0,0,0))
+        view.win.fill((0, 0, 0))
         w = self.words[self.cw]
         i = self.idx
         if self.cnt and i < len(w):
-            if i > 0 and w[i-1] in self.mt and w[i] == self.mt[w[i-1]]:
-                self.words[self.cw] = w[:i-1] + w[i+1:]
+            if i > 0 and w[i - 1] in self.mt and w[i] == self.mt[w[i - 1]]:
+                self.words[self.cw] = w[:i - 1] + w[i + 1:]
                 self.idx -= 1
             elif w[i] in self.mt:
                 self.idx += 1
             else:
                 if i < len(w) - 1:
-                    self.words[self.cw] = w[:i+1]
+                    self.words[self.cw] = w[:i + 1]
                 else:
                     self.words[self.cw] += " {}".format(self.z1[w[i]])
                     self.cnt = False
         elif self.cnt and i == len(w):
             score = 0
-            for j in range(i,0,-1):
-                score = score * 5 + self.z2[w[j-1]]
+            for j in range(i, 0, -1):
+                score = score * 5 + self.z2[w[j - 1]]
             self.words[self.cw] += " {}".format(score)
             self.cnt = False
         else:
             self.idx = 0
             self.cw += 1
             self.cnt = True
-   
+
         self.display.render(view.win, self.words, self.cw, self.idx)
 
 
-
-def init(my_dir, controller):    
-    with open(my_dir + "/input/day10.txt") as f:
+def init(controller):
+    with open(controller.workdir() + "/input/day10.txt") as f:
         lines = f.read().splitlines()
-        disp = DotDisplay((25,15))
+        disp = DotDisplay((25, 15))
         controller.add(Solver(lines[:50], disp))
+    return controller
 
 
 view = View(1920, 1080, 60)
 view.setup("Day 10")
 controller = Controller()
-my_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-init(my_dir, controller)
-view.record(my_dir + "/day10.mp4")
-controller.run(view)
+init(controller).run(view)

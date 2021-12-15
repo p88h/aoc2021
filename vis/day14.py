@@ -13,18 +13,17 @@
 # limitations under the License.
 
 import pygame
-import os
 import random
 from common import View, Controller
-from functools import reduce
+
 
 class Element:
     def __init__(self, font, ch):
         self.surface = pygame.Surface((32, 32))
-        bg = (random.randint(20,80),random.randint(20,80),random.randint(20,80))
-        col = (random.randint(160,240),random.randint(160,240),random.randint(160,240))
+        bg = (random.randint(20, 80), random.randint(20, 80), random.randint(20, 80))
+        col = (random.randint(160, 240), random.randint(160, 240), random.randint(160, 240))
         self.surface.fill(bg)
-        pygame.draw.rect(self.surface,(200,160,80),(0,0,32,32),2)
+        pygame.draw.rect(self.surface, (200, 160, 80), (0, 0, 32, 32), 2)
         font.render_to(self.surface, (12, 20), ch, col)
 
 
@@ -32,10 +31,10 @@ class ChainRenderer:
     def __init__(self, font):
         self.chars = {}
         self.font = font
-        for c in range(65,91):
-            self.chars[chr(c)]=Element(font,chr(c))
+        for c in range(65, 91):
+            self.chars[chr(c)] = Element(font, chr(c))
 
-    def render(self, win, word, a, b, pos = (10,10)):
+    def render(self, win, word, a, b, pos=(10, 10)):
         idx = 0
         (px, py) = pos
         W = self.chars['A'].surface.get_width()
@@ -43,23 +42,24 @@ class ChainRenderer:
         B = 53
         L = 19
         for c in word:
-            if (idx == L*B):
+            if (idx == L * B):
                 break
             (x, y) = pos
             r = (idx // B)
-            x += (B-abs((idx%(B*2))-B)-r%2) * (S+W)
-            y += r * (S+W)
-            win.blit(self.chars[c].surface, (x,y))
+            x += (B - abs((idx % (B * 2)) - B) - r % 2) * (S + W)
+            y += r * (S + W)
+            win.blit(self.chars[c].surface, (x, y))
             if y > py:
-                pygame.draw.line(win, (200,160,80), (x+W//2,y),(x+W//2,y-S), 2)
+                pygame.draw.line(win, (200, 160, 80), (x + W // 2, y), (x + W // 2, y - S), 2)
             elif x > px:
-                pygame.draw.line(win, (200,160,80), (x-S,y+W//2),(x,y+W//2), 2)
+                pygame.draw.line(win, (200, 160, 80), (x - S, y + W // 2), (x, y + W // 2), 2)
             elif x < px:
-                pygame.draw.line(win, (200,160,80), (x+W,y+W//2),(x+W+S,y+W//2), 2)
+                pygame.draw.line(win, (200, 160, 80), (x + W, y + W // 2),
+                                 (x + W + S, y + W // 2), 2)
             if idx == a or idx == b:
-                pygame.draw.rect(win,(250,250,200), (x, y, W, W), 2)
+                pygame.draw.rect(win, (250, 250, 200), (x, y, W, W), 2)
             if idx > a and idx < b:
-                pygame.draw.rect(win,(200,250,200), (x, y, W, W), 2)
+                pygame.draw.rect(win, (200, 250, 200), (x, y, W, W), 2)
             (px, py) = (x, y)
             idx += 1
 
@@ -74,11 +74,11 @@ class CountRenderer:
         z = None
         for c in word:
             if z:
-                counts[z+c] = 1 if (z+c) not in counts else counts[z+c]+1
-            z = c        
+                counts[z + c] = 1 if (z + c) not in counts else counts[z + c] + 1
+            z = c
         return counts
-    
-    def render(self, win, counts, iter, word, pos = (10,710)):
+
+    def render(self, win, counts, iter, word, pos=(10, 710)):
         idx = 0
         W = self.chars['A'].surface.get_width()
         S = 4
@@ -86,12 +86,12 @@ class CountRenderer:
         for p in counts:
             (x, y) = pos
             x += (idx//10) * W * 4
-            y += (idx%10) * (S+W)
-            win.blit(self.chars[p[0]].surface, (x,y))
-            win.blit(self.chars[p[1]].surface, (x + W,y))
-            self.font.render_to(win, (x + 2*W + S, y + W//2 + 4), str(counts[p]), (200,250,200))
+            y += (idx % 10) * (S+W)
+            win.blit(self.chars[p[0]].surface, (x, y))
+            win.blit(self.chars[p[1]].surface, (x + W, y))
+            self.font.render_to(win, (x + 2*W + S, y + W//2 + 4), str(counts[p]), (200, 250, 200))
             idx += 1
-            ccounts[p[1]] = counts[p] if p[1] not in ccounts else ccounts[p[1]]+counts[p]
+            ccounts[p[1]] = counts[p] if p[1] not in ccounts else ccounts[p[1]] + counts[p]
         lmax = lmin = word[0]
         for l in ccounts:
             if ccounts[l] < ccounts[lmin]:
@@ -99,13 +99,13 @@ class CountRenderer:
             if ccounts[l] > ccounts[lmin]:
                 lmax = l
         (x, y) = pos
-        x += (1 + idx//10) * W * 4
+        x += (1 + idx // 10) * W * 4
         txt = "Iteration: {}".format(iter)
-        self.font.render_to(win, (x, y + 16), txt, (200,250,200))
+        self.font.render_to(win, (x, y + 16), txt, (200, 250, 200))
         txt = "Min element: {} -> {}".format(lmin, ccounts[lmin])
-        self.font.render_to(win, (x, y + 32), txt, (200,250,200))
+        self.font.render_to(win, (x, y + 32), txt, (200, 250, 200))
         txt = "Max element: {} -> {}".format(lmax, ccounts[lmax])
-        self.font.render_to(win, (x, y + 48), txt, (200,250,200))
+        self.font.render_to(win, (x, y + 48), txt, (200, 250, 200))
 
 
 class Polymer:
@@ -131,21 +131,21 @@ class Polymer:
                 if p in self.rules:
                     l = p[0] + self.rules[p]
                     r = self.rules[p] + p[1]
-                    nmap[l] = x if l not in nmap else nmap[l]+x
-                    nmap[r] = x if r not in nmap else nmap[r]+x
+                    nmap[l] = x if l not in nmap else nmap[l] + x
+                    nmap[r] = x if r not in nmap else nmap[r] + x
             self.cntmap = nmap
 
-        pfx = self.word[self.idx:self.idx+2]
+        pfx = self.word[self.idx:self.idx + 2]
         pidx = self.idx
         if pfx in rules:
-            self.word = self.word[:self.idx+1] + rules[pfx] + self.word[self.idx+1:]
+            self.word = self.word[:self.idx + 1] + rules[pfx] + self.word[self.idx + 1:]
             self.idx += 2
         else:
             self.idx += 1
-        
+
         cm = self.countr.count(self.word) if len(self.word) < 1024 else self.cntmap
 
-        view.win.fill((0,0,0))
+        view.win.fill((0, 0, 0))
         self.chainr.render(view.win, self.word, pidx, self.idx)
         self.countr.render(view.win, cm, self.iter, self.word)
 
@@ -153,15 +153,13 @@ class Polymer:
 view = View(1920, 1080, 30)
 view.setup("Day 14")
 controller = Controller()
-my_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-with open(my_dir + "/input/day14.txt") as f:
+with open(controller.workdir() + "/input/day14.txt") as f:
     lines = f.read().splitlines()
     rules = {}
     for l in lines[2:]:
         (f, t) = l.split(' -> ')
-        rules[f]=t
+        rules[f] = t
     chain = ChainRenderer(view.font)
     count = CountRenderer(chain)
-    controller.add(Polymer(chain, count, lines[0], rules))    
-view.record(my_dir + "/day14.mp4")
+    controller.add(Polymer(chain, count, lines[0], rules))
 controller.run(view)
