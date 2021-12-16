@@ -104,10 +104,14 @@ def init(controller):
     board = []
     with open(controller.workdir() + "/input/day11.txt") as f:
         y = 0
-        for l in f.read().splitlines():
-            line = [Tile(x, y, 3 * int(l[x])) for x in range(len(l))]
-            board.append(line)
-            y += 1
+        lines = f.read().splitlines()
+        for _r in range(2):
+            for l in lines:
+                line = [Tile(x, y, 3 * int(l[x])) for x in range(len(l))]
+                lx = len(line)
+                line.extend([Tile(x+lx , y, 3 * int(l[x])) for x in range(len(l))])
+                board.append(line)
+                y += 1
     controller.add(Game(board))
     return controller
 

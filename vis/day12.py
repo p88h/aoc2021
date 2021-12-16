@@ -102,7 +102,6 @@ class Explorer:
         for l in range(4):
             dim = 5*((16-l*4) % 16)
             pygame.draw.arc(self.surf, (240-dim, 200-dim, 160-dim), [4+l*8, 8, 5, 5], 0, 2*PI, 4)
-        print("Explorer route: ", route)
 
     def update(self, view, controller):
         if self.path and controller.animate:
@@ -146,7 +145,6 @@ class Spawn:
     def update(self, view, controller):
         if controller.animate:
             if self.tick <= 0 and self.ei < len(self.routes):
-                print("Spawn explorer", self.ei)
                 controller.add(Explorer(self.caves, self.map, self.routes[self.ei], self))
                 self.last = " -> ".join(self.routes[self.ei])
                 self.ei += 1
@@ -218,23 +216,16 @@ def init(controller, font):
             map[a][b] = path
             map[b][a] = path
             controller.add(path)
-    # stored positions
-    names = ["fs", "end", "he", "DX", "start", "pj", "zg", "sl", "RW", "WI"]
-    poses = [(369, 750), (968, 1011), (989, 570), (368, 269), (988, 49),
-             (984, 273), (1644, 697), (1643, 936), (1632, 258), (999, 795)]
-    for i in range(len(names)):
-        if names[i] in caves:
-            caves[names[i]].pos = poses[i]
     for c in caves.values():
         controller.add(c, clickable=True)
     visited["start"] = 1
     paths = explore(map, "start", visited, 2, [])
-    # random.shuffle(paths)
+    random.shuffle(paths)
     controller.add(Spawn(caves, map, paths))
     return controller
 
 
 view = View(1920, 1080, 30)
 view.setup("Day 12")
-controller = Controller(start_anim=False)
+controller = Controller()
 init(controller, view.font).run(view)

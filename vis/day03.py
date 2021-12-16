@@ -63,6 +63,7 @@ class Dataset:
     def update(self, view, controller):
         if self.bit == 12:
             controller.animate = False
+        if not controller.animate:
             return
         if self.mode == 1:
             view.win.fill((0, 0, 0))
@@ -95,8 +96,6 @@ class Dataset:
         for i in range(self.idx, len(self.lines)):
             self.paint(view, self.lines[i], i-self.idx+fl+1)
         self.legend(view)
-        if not controller.animate:
-            return
         if self.idx < len(self.lines):
             item = self.lines[self.idx]
             if item[self.bit] == self.major:

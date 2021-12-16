@@ -80,6 +80,7 @@ class Controller:
         self.clickables = []
         parser = argparse.ArgumentParser()
         parser.add_argument("-r", "--rec", help="record movie", action="store_true")
+        parser.add_argument("-f", "--fps", help="set fps", type=int)
         self.args = parser.parse_args()
 
     def workdir(self):
@@ -100,6 +101,9 @@ class Controller:
     def run(self, view):
         if self.args.rec:
             view.record(os.path.join(self.workdir(), self.basename() + ".mp4"))
+        if self.args.fps:
+            view.fps = self.args.fps
+            print("Override FPS to: ", view.fps)            
         pygame.event.clear()
         start = time.time()
         fcnt = 0

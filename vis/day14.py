@@ -119,6 +119,8 @@ class Polymer:
         self.iter = 1
 
     def update(self, view, controller):
+        if not controller.animate:
+            return
         if self.idx == len(self.word) - 1 or self.idx == 1024:
             if self.iter == 10:
                 controller.animate = False

@@ -25,6 +25,8 @@ class Background:
     def update(self, view, controller):
         if view.frame >= len(self.lines) - 1:
             controller.animate = False
+        if not controller.animate:
+            return
 
         idx = view.frame
         l = self.lines[idx].split()

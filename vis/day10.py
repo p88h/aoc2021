@@ -108,6 +108,7 @@ class Solver:
     def update(self, view, controller):
         if self.cw == len(self.words):
             controller.animate = False
+        if not controller.animate:
             return
         view.win.fill((0, 0, 0))
         w = self.words[self.cw]

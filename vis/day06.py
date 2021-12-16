@@ -24,6 +24,8 @@ class Background:
     def update(self, view, controller):
         if view.frame == 800:
             controller.animate = False
+        if not controller.animate:
+            return
         text = "Day: {} Fish: {}".format(view.frame // 10, len(controller.objects) - 1)
         view.win.fill((0, 0, 0))
         view.font.render_to(view.win, (10, 16), text, (255, 255, 255))
@@ -53,6 +55,8 @@ class Fish:
         self.counter = counter
 
     def update(self, view, controller):
+        if not controller.animate:
+            return
         if not self.pos:
             self.pos = (random.randint(5, view.width), random.randint(5, view.height))
         (x, y) = posmod(view, self.pos, 2)

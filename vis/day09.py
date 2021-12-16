@@ -75,6 +75,8 @@ class Background:
                 board[y][x].render_block(self.surf)
 
     def update(self, view, _):
+        if not controller.animate:
+            return
         view.win.fill((0, 0, 0, 0))
         view.win.blit(self.surf, (0, 0))
 
@@ -86,6 +88,8 @@ class Water:
         self.board = board
 
     def update(self, view, controller):
+        if not controller.animate:
+            return
         self.surf.fill((0, 0, 0, 0))
         merge = 0
         if self.level < 17:

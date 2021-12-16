@@ -30,6 +30,7 @@ class Painter:
     def update(self, view, controller):
         if view.frame >= self.b:
             controller.animate = False
+        if not controller.animate:
             return
         view.win.fill((0, 0, 0))
         c = view.frame

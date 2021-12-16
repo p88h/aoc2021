@@ -105,6 +105,7 @@ class Board:
     def update(self, view, controller):
         if not self.bfsstep():
             controller.animate = False
+        if not controller.animate:
             return
         for i in range(self.maxs):
             self.bfsstep()

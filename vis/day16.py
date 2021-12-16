@@ -229,6 +229,8 @@ class Solver:
         return items
 
     def update(self, view, controller):
+        if not controller.animate:
+            return
         view.win.fill((0, 0, 0))
 
         if self.hexpos < len(self.hexstring):
@@ -249,6 +251,9 @@ class Solver:
         items.append(self.bitstring[self.bitpos:])
         items.append(self.hexstring[self.hexpos:])
         self.display.render(view.win, items, self.biteat-self.bitpos)
+        
+        if self.answer:
+            controller.animate = False
 
 
 def init(controller):

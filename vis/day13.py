@@ -140,6 +140,8 @@ class Splitter:
         self.si = 0
 
     def update(self, view, controller):
+        if not controller.animate:
+            return
         view.win.fill((0, 0, 0))
         self.space.update(view, controller)
         if view.frame % 30 == 0 and self.si < len(self.splits):
