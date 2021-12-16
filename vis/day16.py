@@ -16,6 +16,7 @@ import pygame
 import math
 from common import View, Controller
 
+
 class DotFont:
     def __init__(self) -> None:
         self.segmap = {
@@ -65,7 +66,7 @@ class DotUnit:
         self.draw(' ', 0)
         self.pos = pos
 
-    def draw(self, digit, csel = 0):
+    def draw(self, digit, csel=0):
         segs = self.font.get(digit)
         for i in range(len(segs)):
             for j in range(len(segs[i])):
@@ -74,10 +75,10 @@ class DotUnit:
                 col = cols[csel]
                 if segs[i][j] == 0:
                     col = (60, 60, 60)
-                pygame.draw.rect(self.tmp, col, (x0, y0, 3, 3))        
+                pygame.draw.rect(self.tmp, col, (x0, y0, 3, 3))
         self.last = (digit, csel)
 
-    def render(self, surface, digit, csel = 0):
+    def render(self, surface, digit, csel=0):
         if (digit, csel) != self.last:
             self.draw(digit, csel)
         surface.blit(self.tmp, self.pos)
@@ -111,7 +112,7 @@ class DotDisplay:
                 pfx = bitpfx
             if i == l - 1:
                 csel = 2
-            for j in range(1 + len(items[i]) // 110): 
+            for j in range(1 + len(items[i]) // 110):
                 if k == 50:
                     break
                 w = items[i][j*110:(j+1)*110]
@@ -119,7 +120,7 @@ class DotDisplay:
                 k += 1
         while k < len(self.lines):
             self.lines[k].render(surface, "", 0, 0)
-            k += 1            
+            k += 1
 
 
 class Solver:
@@ -133,16 +134,15 @@ class Solver:
         self.bitneed = 0
         self.display = display
         self.idx = 0
-        self.ops = {0:"+",1:"*",2:"v",3:"^",4:"L",5:">",6:"<",7:"="}
+        self.ops = {0: "+", 1: "*", 2: "v", 3: "^", 4: "L", 5: ">", 6: "<", 7: "="}
         self.state = 0
         self.answer = None
 
-
     def bitlen(self):
-        v = int(self.bitstring[self.bitpos:self.bitpos+3],2)
-        t = int(self.bitstring[self.bitpos+3:self.bitpos+6],2)
+        v = int(self.bitstring[self.bitpos:self.bitpos+3], 2)
+        t = int(self.bitstring[self.bitpos+3:self.bitpos+6], 2)
         sz = 6
-        if t in [ 0,1,2,3,5,6,7 ]:
+        if t in [0, 1, 2, 3, 5, 6, 7]:
             sz += 12 if self.bitstring[self.bitpos + 6] == 1 else 16
         elif t == 4:
             while self.bitstring[self.bitpos + sz] == 1:
@@ -150,31 +150,30 @@ class Solver:
             sz += 5
         return sz
 
-
     def parse(self):
-        v = int(self.bitstring[self.bitpos:self.bitpos+3],2)
-        t = int(self.bitstring[self.bitpos+3:self.bitpos+6],2)
+        v = int(self.bitstring[self.bitpos:self.bitpos+3], 2)
+        t = int(self.bitstring[self.bitpos+3:self.bitpos+6], 2)
         self.bitpos += 6
-        if t in [ 0,1,2,3,5,6,7 ]:
+        if t in [0, 1, 2, 3, 5, 6, 7]:
             k = int(self.bitstring[self.bitpos])
             self.bitpos += 1
             if k:
-                n = int(self.bitstring[self.bitpos:self.bitpos+11],2)
+                n = int(self.bitstring[self.bitpos:self.bitpos+11], 2)
                 self.bitpos += 11
-                self.stack.append((self.ops[t],"[","]", n, []))
+                self.stack.append((self.ops[t], "[", "]", n, []))
             else:
-                l = int(self.bitstring[self.bitpos:self.bitpos+15],2)
+                l = int(self.bitstring[self.bitpos:self.bitpos+15], 2)
                 self.bitpos += 15
-                self.stack.append((self.ops[t],"(",")", self.bitpos + l, []))
+                self.stack.append((self.ops[t], "(", ")", self.bitpos + l, []))
         elif t == 4:
             acc = 0
             while True:
                 m = int(self.bitstring[self.bitpos])
-                acc = acc * 16 + int(self.bitstring[self.bitpos+1:self.bitpos+5],2)
+                acc = acc * 16 + int(self.bitstring[self.bitpos+1:self.bitpos+5], 2)
                 self.bitpos += 5
                 if m == 0:
                     break
-            self.stack.append((self.ops[t],"=","",1,[ acc ]))
+            self.stack.append((self.ops[t], "=", "", 1, [acc]))
 
     def ready(self, elem):
         (_op, d1, _d2, lim, arr) = elem
@@ -182,11 +181,11 @@ class Solver:
 
     def check(self):
         if not self.stack:
-            return False                            
+            return False
         if not self.ready(self.stack[-1]):
             return False
         (op, d1, _d2, lim, arr) = self.stack.pop()
-        v = 0          
+        v = 0
         if op == "L":
             v = arr[0]
         elif op == "+":
@@ -212,31 +211,30 @@ class Solver:
 
     def describe(self):
         if self.answer:
-            return [ str(self.answer) ]
-        items = [ ]
+            return [str(self.answer)]
+        items = []
         for frame in self.stack:
             (op, d1, d2, lim, arr) = frame
-            header = "{}{}{}".format(op, d1,','.join([str(i) for i in arr ]))
+            header = "{}{}{}".format(op, d1, ','.join([str(i) for i in arr]))
             if not self.ready(frame):
                 header += " ... "
                 if d1 == "[":
                     header += "+{}".format(lim - len(arr))
                 else:
                     header += "~{}".format(lim - self.bitpos)
-            header += d2                
+            header += d2
             while len(header) % 10:
                 header += " "
             items.append(header)
         return items
 
-
     def update(self, view, controller):
         view.win.fill((0, 0, 0))
-        
+
         if self.hexpos < len(self.hexstring):
             self.bitstring += "{:04b}".format(int(self.hexstring[self.hexpos], 16))
             self.hexpos += 1
-        
+
         if self.answer or self.check():
             pass
         elif self.bitneed == 0 and len(self.bitstring) > 40:
@@ -245,12 +243,12 @@ class Solver:
             self.parse()
             self.bitneed = 0
         elif len(self.bitstring) > 40:
-            self.biteat += 4
+            self.biteat += 2
 
         items = self.describe()
         items.append(self.bitstring[self.bitpos:])
         items.append(self.hexstring[self.hexpos:])
-        self.display.render(view.win, items, self.biteat-self.bitpos )
+        self.display.render(view.win, items, self.biteat-self.bitpos)
 
 
 def init(controller):
@@ -261,7 +259,7 @@ def init(controller):
     return controller
 
 
-view = View(1920, 1080, 30)
+view = View(1920, 1080, 60)
 view.setup("Day 16")
 controller = Controller()
 init(controller).run(view)
