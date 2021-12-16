@@ -100,14 +100,22 @@ class DotDisplay:
         self.font = DotFont()
         self.lines = [DotLine(self.font, (x, y + i * 21)) for i in range(50)]
 
-    def render(self, surface, items, post):
+    def render(self, surface, items, bitpfx):
         k = 0
-        for i in range(len(items)):
-            for j in range(1 + len(items[i]) // 110):
+        l = len(items)
+        for i in range(l):
+            pfx = 0
+            csel = 0
+            if i == l - 2:
+                csel = 1
+                pfx = bitpfx
+            if i == l - 1:
+                csel = 2
+            for j in range(1 + len(items[i]) // 110): 
                 if k == 50:
                     break
                 w = items[i][j*110:(j+1)*110]
-                self.lines[k].render(surface, w, i, post[i]-j*110)
+                self.lines[k].render(surface, w, csel, pfx - j*110)
                 k += 1
         while k < len(self.lines):
             self.lines[k].render(surface, "", 0, 0)
@@ -204,7 +212,7 @@ class Solver:
 
     def describe(self):
         if self.answer:
-            return str(self.answer)
+            return [ str(self.answer) ]
         items = [ ]
         for frame in self.stack:
             (op, d1, d2, lim, arr) = frame
@@ -219,7 +227,7 @@ class Solver:
             while len(header) % 10:
                 header += " "
             items.append(header)
-        return " ".join(items)
+        return items
 
 
     def update(self, view, controller):
@@ -239,10 +247,10 @@ class Solver:
         elif len(self.bitstring) > 40:
             self.biteat += 4
 
-        items = [ self.describe() ]
+        items = self.describe()
         items.append(self.bitstring[self.bitpos:])
         items.append(self.hexstring[self.hexpos:])
-        self.display.render(view.win, items, [ 0, self.biteat-self.bitpos, 0 ])
+        self.display.render(view.win, items, self.biteat-self.bitpos )
 
 
 def init(controller):
