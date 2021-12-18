@@ -122,7 +122,7 @@ class Node:
     def __init__(self) -> None:
         self.value = None
         self.left = self.right = None
-    
+
     def addtofirst(self, val):
         if not self.left:
             self.value += val
@@ -135,7 +135,7 @@ class Node:
         else:
             self.right.addtolast(val)
 
-    def tryexplode(self, depth = 0):
+    def tryexplode(self, depth=0):
         if depth < 4 and self.left:
             (e, l, r) = self.left.tryexplode(depth+1)
             if not e:
@@ -146,7 +146,7 @@ class Node:
             elif r > 0:
                 self.right.addtofirst(r)
                 r = -1
-            return (e, l, r)                
+            return (e, l, r)
         if depth == 4 and self.left:
             ret = (True, self.left.value, self.right.value)
             self.value = 0
@@ -154,7 +154,7 @@ class Node:
             return ret
         else:
             return (False, -1, -1)
-    
+
     def trysplit(self):
         if self.left:
             return self.left.trysplit() or self.right.trysplit()
@@ -167,86 +167,85 @@ class Node:
             return True
         else:
             return False
-    
+
     def magnitude(self):
         if self.left:
-            return 3*self.left.magnitude()+2*self.right.magnitude()        
+            return 3*self.left.magnitude()+2*self.right.magnitude()
         else:
             return self.value
 
-    def str(self, depth = 0):
+    def str(self, depth=0):
         if not self.left:
             return str(self.value)
         else:
             return ("[")+self.left.str(depth+1)+","+self.right.str(depth+1)+"]"
+
 
 class Solver:
     def __init__(self, lines, display):
         self.lines = lines
         self.display = display
         self.idx = 0
-        self.state = 0
-        (_, self.top) = self.parse(lines[0],1)
+        (_, self.top) = self.parse(lines[0], 1)
         self.other = None
 
-    def number(self,line,pos):
-        npos=pos
+    def number(self, line, pos):
+        npos = pos
         while line[npos] != ',' and line[npos] != ']':
-            npos+=1
+            npos += 1
         node = Node()
-        node.value=int(line[pos:npos])
+        node.value = int(line[pos:npos])
         return (npos+1, node)
 
-    def parse(self,line,pos):
-        node =  Node()
+    def parse(self, line, pos):
+        node = Node()
         npos = pos
         if line[npos] == '[':
-            (npos, node.left) = self.parse(line,npos+1)
+            (npos, node.left) = self.parse(line, npos+1)
         else:
             (npos, node.left) = self.number(line, npos)
         if line[npos] == '[':
-            (npos, node.right) = self.parse(line,npos+1)
+            (npos, node.right) = self.parse(line, npos+1)
         else:
             (npos, node.right) = self.number(line, npos)
         return (npos+1, node)
 
-
-    def add(self,left, right):
+    def add(self, left, right):
         node = Node()
         node.left = left
         node.right = right
         return node
 
-    def fixup(node):
-        while True:
-            (e, _, _) = node.tryexplode(0)
-            if not e:
-                e = node.trysplit()
-                if not e:
-                    return
-
     def update(self, view, controller):
-        (e, _, _) = self.top.tryexplode(0)
-        if not e:
-            e = self.top.trysplit()
-        if not e and self.idx + 1 >= len(self.lines):
-            controller.animate = False
         if not controller.animate:
             return
-        
+        cnt = 0
+        while cnt < min(64, self.idx):
+            (e, _, _) = self.top.tryexplode(0)
+            if not e:
+                e = self.top.trysplit()
+            if e:
+                cnt += 1
+            else:
+                break
+        e = cnt > 0
         if self.other:
             self.top = self.add(self.top, self.other)
             self.other = None
             self.idx += 1
-        elif not e:
+            e = True
+        elif not e and self.idx + 1 < len(self.lines):
             (_, self.other) = self.parse(self.lines[self.idx + 1], 1)
 
         self.lines[self.idx] = self.top.str()
-        if self.idx == len(self.lines)-1:
+        if not e and self.idx == len(self.lines)-1:
             self.lines[self.idx] += " = {}".format(self.top.magnitude())
         view.win.fill((0, 0, 0))
         self.display.render(view.win, self.lines[self.idx:], 0)
-        
+
+        if not e and self.idx + 1 >= len(self.lines):
+            controller.animate = False
+
 
 def init(controller):
     with open(controller.workdir() + "/input/day18.txt") as f:
