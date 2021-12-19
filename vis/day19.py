@@ -32,7 +32,7 @@ class Solver:
         self.done = set()
         self.next = [ self.scanners[0] ]
         self.rest = self.scanners[1:]
-        self.shifts = []
+        self.shifts = [ (0,0,0) ]
         self.unrest = []
         self.aligned = None
 

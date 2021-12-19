@@ -68,7 +68,7 @@ defmodule Aoc2021.Day19 do
 
   def part2(args) do
     scans = prep(args)
-    pos = alignall2([], [ hd(scans) ], tl(scans))
+    pos = alignall2([[0,0,0]], [ hd(scans) ], tl(scans))
     distances = for a <- pos, b <- pos, into: [], do: delta(a,b)
     Enum.max(distances)
   end
