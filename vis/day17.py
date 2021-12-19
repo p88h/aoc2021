@@ -108,6 +108,6 @@ def init(controller):
 
 
 view = View(1920, 1080, 30)
-view.setup("Day 02")
+view.setup("Day 17")
 controller = Controller()
 init(controller).run(view)
