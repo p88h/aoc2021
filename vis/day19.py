@@ -105,7 +105,7 @@ class Plotter:
         view.win.fill((0,0,0))
         self.solver.solve_step()
         dy = 16        
-        for s in self.solver.next[-5:-1]:
+        for s in self.solver.next[-5:]:
             self.render(view, s, dy, (200,255,200))
             dy += 56
         if self.solver.aligned:
