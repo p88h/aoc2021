@@ -1,32 +1,46 @@
 import time
+import copy
 
 class Board:
     def __init__(self, rules, lines):
         self.bitmap = [ 1 if c == '#' else 0 for c in rules ]
         self.size = len(lines)
-        self.board = {}
+        self.ofs = 52
         self.dflt = 0
+        self.board = []
+        for y in range(self.ofs):
+            self.board.append([0] * (self.size + self.ofs*2))
         for y in range(len(lines)):
+            self.board.append([])
+            self.board[self.ofs+y].extend([0] * self.ofs)
             for x in range(len(lines[y])):
-                self.board[(x, y)] = 1 if lines[y][x] == '#' else 0
+                self.board[self.ofs+y].append(1 if lines[y][x] == '#' else 0)
+            self.board[self.ofs+y].extend([0] * self.ofs)
+        for y in range(self.ofs):
+            self.board.append([0] * (self.size + self.ofs*2))
+        self.old = copy.deepcopy(self.board)
 
     def iter(self, step):
         ndflt = self.bitmap[0] if self.dflt == 0 else self.bitmap[-1]
         total = 0
-        old = self.board.copy()
-        self.board={}
-        for x in range(-step,self.size+step):
+        (self.old, self.board) = (self.board, self.old)
+        self.ofs -= 1
+        self.size += 2
+        # clean all margins
+        for x in range(self.ofs-1,self.ofs+self.size+2):
+            self.old[self.ofs-1][x]=self.old[self.ofs][x]=self.dflt
+            self.old[self.ofs+self.size-1][x]=self.old[self.ofs+self.size][x]=self.dflt
+        for y in range(self.ofs-1,self.ofs+self.size+2):
+            self.old[y][self.ofs-1]=self.old[y][self.ofs]=self.dflt
+            self.old[y][self.ofs+self.size-1]=self.old[y][self.ofs+self.size]=self.dflt
+        for x in range(self.ofs,self.ofs+self.size):
             pval = 0 if self.dflt == 0 else 63
-            for y in range(-step, self.size+step):
-                fval = pval & 63
-                for dx in [-1,0,1]:
-                    bit = old.get((x+dx,y+1), self.dflt)
-                    fval = fval * 2 + bit
+            for y in range(self.ofs,self.ofs+self.size):
+                fval = (pval & 63)*8 + self.old[y+1][x-1]*4+self.old[y+1][x]*2+self.old[y+1][x+1]
                 pval = fval
                 nbit = self.bitmap[fval]
                 total += nbit
-                if nbit != ndflt:
-                    self.board[(x,y)]=nbit
+                self.board[y][x]=nbit
         self.dflt = ndflt
         return total
 
