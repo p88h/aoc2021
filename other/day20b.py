@@ -26,7 +26,6 @@ class Board:
         (self.old, self.board) = (self.board, self.old)
         self.ofs -= 1
         self.size += 2
-        # clean all margins
         for x in range(self.ofs-1,self.ofs+self.size+2):
             self.old[self.ofs-1][x]=self.old[self.ofs][x]=self.dflt
             self.old[self.ofs+self.size-1][x]=self.old[self.ofs+self.size][x]=self.dflt
