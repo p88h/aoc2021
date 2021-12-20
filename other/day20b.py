@@ -1,5 +1,4 @@
 import time
-import itertools
 
 class Board:
     def __init__(self, rules, lines):
@@ -17,7 +16,7 @@ class Board:
         old = self.board.copy()
         self.board={}
         for x in range(-step,self.size+step):
-            pval = 0
+            pval = 0 if self.dflt == 0 else 63
             for y in range(-step, self.size+step):
                 fval = pval & 63
                 for dx in [-1,0,1]:
