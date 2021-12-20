@@ -72,7 +72,8 @@ class Board:
                 rx = 99-(x+self.ofsx)
                 ry = y+self.ofsy
                 pos = (60 + rx * 9 + ry * 9, 572 - rx * 5 + ry * 5)
-                self.tiles[self.board[(x, y)]].blit(view.win, pos)
+                if self.board[(x, y)]:
+                    self.tiles[1].blit(view.win, pos)
         # new default value for tiles outside of the board
         ndflt = self.bitmap[0] if self.dflt == 0 else self.bitmap[-1]
         self.minx -= 1
@@ -104,6 +105,6 @@ def init(controller):
     return controller
 
 
-view = View(1920, 1080, 5)
+view = View(1920, 1080, 6)
 view.setup("Day 20")
 init(Controller()).run(view)
