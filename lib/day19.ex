@@ -1,17 +1,3 @@
-# Copyright 2021 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#    https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 defmodule Aoc2021.Day19 do
   def parse(l), do: Enum.map(tl(l), fn x -> String.split(x, ",") |> Enum.map(&String.to_integer/1) end)
   def prep(args), do: Enum.chunk_by(args, &(&1=="")) |> Enum.reject(&(&1==[""])) |> Enum.map(&parse(&1))
