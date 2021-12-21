@@ -20,9 +20,9 @@ defmodule Aoc2021.Day21 do
   end
 
   def produce3({{p1, p2, s1, s2}, c}, {ret, w1, w2}) do
-    quants = for d1 <- 1..3, d2 <- 1..3, d3 <- 1..3 do
-      np = rem(p1 + d1 + d2 + d3 - 1, 10) + 1
-      {{np, p2, s1+np, s2}, c}
+    quants = for {d,f} <- [{6, 7},{5, 6},{7, 6},{4, 3},{8, 3},{3, 1},{9, 1}] do
+      np = rem(p1 + d - 1, 10) + 1
+      {{np, p2, s1+np, s2}, c * f}
     end
     Enum.reduce(quants, {ret, w1, w2}, &addstate/2)
   end
