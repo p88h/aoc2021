@@ -7,10 +7,10 @@ defmodule Aoc2021.Day05 do
   def next(a, a), do: a
   def next(a, b), do: if a < b, do: a + 1, else: a - 1
 
-  def plot([a, b, a, b], map), do: Map.update(map, {a, b}, 1, fn v -> v + 1 end)
-  def plot([a, b, c, d], map), do: plot([next(a, c), next(b, d), c, d ], plot([a, b, a, b], map))
+  def plot([a, b, a, b], acc), do: [ {a,b} | acc ]
+  def plot([a, b, c, d], acc), do: plot([next(a, c), next(b, d), c, d ], [ {a,b} | acc ] )
 
-  def solve(l), do: Enum.reduce(l, %{}, &plot/2) |> Enum.count(fn {_,v} -> v > 1 end)
+  def solve(l), do: Enum.reduce(l, [], &plot/2) |> Enum.frequencies() |> Enum.count(&(elem(&1,1)>1))
 
   def part1(args), do: parse(args) |> Enum.filter(fn [a,b,c,d] -> a == c or b == d end) |> solve()
   def part2(args), do: parse(args) |> solve()
