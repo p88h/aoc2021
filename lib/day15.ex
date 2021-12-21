@@ -7,27 +7,24 @@ defmodule Aoc2021.Day15 do
     {map, length(lol)*r-1, length(hd(lol))*r-1, length(lol), length(hd(lol)) }
   end
 
-  def update(pq, {map, ly, lx, my, mx}, cost, dist, p={y,x}) when y>=0 and y<=ly and x>=0 and x<=lx do
-    oldd = if is_map_key(cost, p), do: cost[p], else: 999999999
+  def update({pq, cost}, {map, ly, lx, my, mx}, dist, p={y,x}) when y>=0 and y<=ly and x>=0 and x<=lx and not is_map_key(cost, p) do
     newd = dist + rem(map[{rem(y,my),rem(x,mx)}]+div(y,my)+div(x,mx)-1,9)+1
-    if newd < oldd, do: PriorityQueue.put(pq, {newd, p}), else: pq
+    { Map.update(pq, newd, [p], &([p|&1])), Map.put(cost, p, newd) }
   end
-  def update(pq, _map, _cost, _dist, _pos), do: pq
+  def update({pq, cost}, _map, _dist, _pos), do: { pq, cost }
 
-  def explore({_map, ly, lx, _, _}, _cost, _pq, { dist, {ly,lx} }), do: dist
-  def explore(mp, cost, pq, { dist, {y,x} }) do
-    pq = PriorityQueue.delete_min!(pq)
-    if not is_map_key(cost, {y,x}) or cost[{y,x}] > dist do
-      cost = Map.put(cost, {y,x}, dist)
+  def explore({_map, ly, lx, _, _}, _cost, _pq, dist, [ {ly,lx} | _ ] ), do: dist
+  def explore(mp, cost, pq, dist, [] ), do: explore(mp, cost, pq, dist + 1, Map.get(pq, dist+1, []))
+  def explore(mp, cost, pq, dist, [ {y,x} | t ] ) do
+    if not is_map_key(cost, {y,x}) or cost[{y,x}] >= dist do
       ms = Enum.map([ {-1,0},{1,0},{0,-1},{0,1} ], fn {a,b} -> {y+a,x+b} end)
-      pq = Enum.reduce(ms, pq, &update(&2, mp, cost, dist, &1))
-      explore(mp, cost, pq, PriorityQueue.min!(pq))
+      {pq, cost} = Enum.reduce(ms, {pq, cost}, &update(&2, mp, dist, &1))
+      explore(mp, cost, pq, dist, t)
     else
-      explore(mp, cost, pq, PriorityQueue.min!(pq))
+      explore(mp, cost, pq, dist, t)
     end
   end
 
-  def startq(), do: PriorityQueue.new() |> PriorityQueue.put({0,{0,0}})
-  def part1(args), do: load(args, 1) |> explore(%{}, startq(), {0,{0,0}})
-  def part2(args), do: load(args, 5) |> explore(%{}, startq(), {0,{0,0}})
+  def part1(args), do: load(args, 1) |> explore(%{}, %{}, 0, [{0,0}])
+  def part2(args), do: load(args, 5) |> explore(%{}, %{}, 0, [{0,0}])
 end
