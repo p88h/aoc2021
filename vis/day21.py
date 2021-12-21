@@ -42,8 +42,12 @@ class Board:
         self.multiverse[(pos[0], pos[1], 0, 0)] = 1
         self.wins = [0, 0]
         self.player = 0
+        self.steps = 0
 
     def produce3(self, p1, p2, s1, s2, c, w, p):
+        if c == 0:
+            return
+        self.steps += 1
         for (d, f) in [(6, 7), (5, 6), (7, 6), (4, 3), (8, 3), (3, 1), (9, 1)]:
             np = ((p1 + d - 1) % 10) + 1
             ns = s1 + np
@@ -57,11 +61,11 @@ class Board:
             return
         view.win.fill((0, 0, 0, 0))
         total = 0
-        for (s1, p1) in itertools.product(range(0, 21),range(1, 11)):
-            for (s2, p2) in itertools.product(range(0, 21),range(1, 11)):
+        for (s1, p1) in itertools.product(range(0, 21), range(1, 11)):
+            for (s2, p2) in itertools.product(range(0, 21), range(1, 11)):
                 x = 209 - (s1 * 10 + p1 - 1)
                 y = 209 - (s2 * 10 + p2 - 1)
-                key = (p1,p2,s1,s2) if self.player == 0 else (p2,p1,s2,s1)
+                key = (p1, p2, s1, s2) if self.player == 0 else (p2, p1, s2, s1)
                 total += self.multiverse[key]
                 if self.multiverse[key] > 0:
                     h = int(1+math.log2(self.multiverse[key]))
@@ -69,15 +73,18 @@ class Board:
                     h = 0
                 pos = (20 + x * 5 + y * 5, 642 - x * 3 + y * 3)
                 self.tiles[h].blit(view.win, pos)
-        if self.multiverse:
+        if total > 0:
             old = self.multiverse.copy()
             self.multiverse = defaultdict(int)
             for (p1, p2, s1, s2) in old:
                 self.produce3(p1, p2, s1, s2, old[(p1, p2, s1, s2)], self.wins, self.player)
             self.player = 1-self.player
-        view.font.render_to(view.win, (20, 20), "Player 1 wins: {}".format(self.wins[0]), (255,255,255))
-        view.font.render_to(view.win, (20, 40), "Player 2 wins: {}".format(self.wins[1]), (255,255,255))
-        view.font.render_to(view.win, (20, 60), "Quantum multiverse count: {}".format(total), (255,255,255))
+        text = ["Player 1 wins: {}".format(self.wins[0]),
+                "Player 2 wins: {}".format(self.wins[1]),
+                "Quantum multiverse count: {}".format(total),
+                "Dice rolls considered: {}".format(self.steps)]
+        for it in range(len(text)):
+            view.font.render_to(view.win, (20, (it+1)* 20 ), text[it], (255, 255, 255))
 
 
 def init(controller):
