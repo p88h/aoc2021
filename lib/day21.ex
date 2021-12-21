@@ -1,8 +1,5 @@
 defmodule Aoc2021.Day21 do
-  def parse(line) do
-    Regex.run(~r/Player (\d+) starting position: (\d+)/, line) |> tl()
-    |> Enum.map(&String.to_integer/1) |> Enum.at(1)
-  end
+  def parse(line), do: String.split(line, ": ") |> Enum.at(1) |> String.to_integer()
 
   def iter([p1, p2], [s1, s2], ofs, cnt) do
     p1 = rem(p1+rem(ofs, 100)+rem(ofs+1,100)+rem(ofs+2,100)+2,10)+1
