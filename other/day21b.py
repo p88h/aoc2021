@@ -37,10 +37,11 @@ def run2(p):
         temp = defaultdict(int)
         for (p, s) in multiverse:
             produce3(temp, p, s, multiverse[(p, s)], wins)
-        multiverse = temp        
+        multiverse = temp
     return wins
 
-def run3(p1,p2):
+
+def run3(p1, p2):
     wins1 = run2(p1)
     wins2 = run2(p2)
     size1 = size2 = 1
@@ -50,7 +51,7 @@ def run3(p1,p2):
         w1 += wins1[step]*size2
         size2 = size2 * 27 - wins2[step]
         w2 += wins2[step]*size1
-    return max(w1,w2)
+    return max(w1, w2)
 
 
 start = time.time()
