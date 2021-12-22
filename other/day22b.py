@@ -19,8 +19,10 @@ class Box:
         self.limits = seq
         self.boxes = []
         self.empty = False
+        self.cvolume = None
     
     def subtract(self, seq):
+        self.cvolume = None
         cropped = crop(seq, self.limits)
         if cropped == self.limits:
             self.empty = True
@@ -28,11 +30,15 @@ class Box:
             return
         box = Box(cropped)
         nboxes = []
+        tvol = 0
         for inner in self.boxes:
             inner.subtract(cropped)
-            if inner.volume() > 0:
+            ivol = inner.volume()
+            if ivol > 0:
                 nboxes.append(inner)
+            tvol += ivol
         nboxes.append(box)
+        self.cvolume = tvol + box.volume()
         self.boxes = nboxes
     
     def volume(self):
@@ -41,6 +47,8 @@ class Box:
         tot = 1
         for (a,b) in self.limits:
             tot *= (b-a)
+        if self.cvolume:
+            return tot - self.cvolume
         return tot - sum(box.volume() for box in self.boxes)
 
 def parse(lines):
