@@ -18,17 +18,26 @@ class Box:
     def __init__(self, seq):
         self.limits = seq
         self.boxes = []
+        self.empty = False
     
     def subtract(self, seq):
         cropped = crop(seq, self.limits)
-        if empty(cropped):
+        if cropped == self.limits:
+            self.empty = True
+        if empty(cropped) or self.empty:
             return
         box = Box(cropped)
+        nboxes = []
         for inner in self.boxes:
             inner.subtract(cropped)
-        self.boxes.append(box)
+            if inner.volume() > 0:
+                nboxes.append(inner)
+        nboxes.append(box)
+        self.boxes = nboxes
     
     def volume(self):
+        if self.empty:
+            return 0
         tot = 1
         for (a,b) in self.limits:
             tot *= (b-a)

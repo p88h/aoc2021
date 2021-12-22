@@ -16,8 +16,9 @@ defmodule Aoc2021.Day22 do
 
   def subtract(box = {dims, lst}, other) do
     cropped = crop(other, dims)
-    if empty(cropped), do: box, else: {dims, [{cropped, []} | Enum.map(lst, &subtract(&1, cropped))]}
+    if empty(cropped), do: box, else: {dims, [{cropped, []} | subtract(lst, cropped)]}
   end
+  def subtract(boxes, other), do: Enum.map(boxes, &subtract(&1, other)) |> Enum.reject(&volume(&1) == 0)
 
   def handle(args, bounds \\ nil) do
     Enum.reduce(Enum.map(args, &parse/1), [], fn {bit, dims}, boxes ->
