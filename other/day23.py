@@ -37,7 +37,7 @@ def move_home(s, cost):
             i+=1
         # go left
         while i > r + 2 and s[i-1] == '.':
-            cb += Costs[a]*2 if i<7 else Costs[a]
+            cb += Costs[a]*2 if i<6 else Costs[a]
             i-=1
         if i != r + 1 and i != r + 2:
             continue
@@ -62,8 +62,8 @@ def move_out(s):
             continue
         rr = row + 2
         cb = Costs[a]*line
-        while rr < 8 and s[rr] == '.':
-            cb += 2*Costs[a] if rr<7 else Costs[a]
+        while rr < 7 and s[rr] == '.':
+            cb += 2*Costs[a] if rr<6 else Costs[a]
             valid.append(move_home(genstate(s, rr, ofs+line), cb))
             rr += 1
         ll = row + 1
@@ -79,27 +79,29 @@ def search(start):
     for _ in range(100000):
         queue.append([])
     queue[0].append(start)
+    previous = {start: None}
     mind = {start: 0}
     total = 1
     done = 0
     for cost in range(50000):
-        tmp = set(queue[cost])
-        print(cost, len(tmp), total, done, done*100//total)
         done += len(queue[cost])
-        queue[cost] = None
-        for state in tmp:
+        for state in queue[cost]:
             if mind[state] < cost:
                 continue
             #display(state)
             valid = move_out(state)
             if all(state[i] == "." for i in range(7)) and len(valid) == 0:
                 print(cost)
-                display(state)
-                return
+                ret = []
+                while state:
+                    ret.append(state)
+                    state = previous[state]
+                return ret
             for (nstate,ncost) in valid:
                 if nstate in mind and mind[nstate] <= cost+ncost:
                     continue
                 #display(nstate)
+                previous[nstate]=state
                 mind[nstate]=cost+ncost
                 queue[cost+ncost].append(nstate)
                 total += 1
@@ -116,4 +118,7 @@ for row in range(4):
     for line in range(4):
         z.append(maze[line+2][3+row*2])
 
-search("".join(z))
+path = search("".join(z))
+for state in path[::-1]:
+    display(state)
+    print()
