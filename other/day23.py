@@ -10,9 +10,7 @@ def display(s):
     print("#############")
 
 def genstate(s, a, b):
-    ns = s.copy()
-    (ns[a], ns[b]) = (ns[b], ns[a])
-    return ns
+    return s[:a] + s[b] + s[a+1:b] + s[a] + s[b+1:]
 
 Homes = {"A": 0, "B": 1, "C": 2, "D": 3}
 Costs = {"A": 1, "B": 10, "C": 100, "D": 1000}
@@ -43,14 +41,13 @@ def move_home(s, cost):
             i-=1
         if i != r + 1 and i != r + 2:
             continue
-        return move_home(genstate(s, ofs+line, hp), cost + cb)
+        return move_home(genstate(s, hp, ofs+line), cost + cb)
     return (s,cost)
 
 def move_out(s):
     global Homes
     global Costs
     # First move everybody in, if possible
-    (s, cost) = move_home(s, 0)
     valid = []
     # Then try to get out, if possible
     for row in range(4):
@@ -64,16 +61,16 @@ def move_out(s):
         if row == Homes[a] and (line == 3 or all(s[i] == a for i in range(ofs+line+1,ofs+4))):
             continue
         rr = row + 2
-        cb = cost + Costs[a]*line
-        while rr < 8 and state[rr] == '.':
+        cb = Costs[a]*line
+        while rr < 8 and s[rr] == '.':
             cb += 2*Costs[a] if rr<7 else Costs[a]
-            valid.append((genstate(s, ofs+line, rr), cb))
+            valid.append(move_home(genstate(s, rr, ofs+line), cb))
             rr += 1
         ll = row + 1
-        cb = cost + Costs[a]*line
-        while ll >= 0 and state[ll] == '.':
+        cb = Costs[a]*line
+        while ll >= 0 and s[ll] == '.':
             cb += 2*Costs[a] if ll>0 else Costs[a]
-            valid.append((genstate(s, ofs+line, ll), cb))            
+            valid.append(move_home(genstate(s, ll, ofs+line), cb))
             ll -= 1
     return valid
 
@@ -81,41 +78,42 @@ def search(start):
     queue = []
     for _ in range(100000):
         queue.append([])
-    key = "".join(start)
-    queue[0].append(key)
-    mind = {key: 0}
+    queue[0].append(start)
+    mind = {start: 0}
     total = 1
     done = 0
-    for cost in range(100000):
+    for cost in range(50000):
         tmp = set(queue[cost])
-        print(cost, len(tmp), len(queue[cost]), total, done, done*100//total)
-        for key in tmp:            
-            if mind[key] < cost:
+        print(cost, len(tmp), total, done, done*100//total)
+        done += len(queue[cost])
+        queue[cost] = None
+        for state in tmp:
+            if mind[state] < cost:
                 continue
-            state = list(key)
+            #display(state)
             valid = move_out(state)
             if all(state[i] == "." for i in range(7)) and len(valid) == 0:
                 print(cost)
                 display(state)
                 return
             for (nstate,ncost) in valid:
-                nkey = "".join(nstate)
-                if nkey in mind and mind[nkey] <= cost+ncost:
+                if nstate in mind and mind[nstate] <= cost+ncost:
                     continue
-                mind[nkey]=cost+ncost
-                queue[cost+ncost].append(nkey)
+                #display(nstate)
+                mind[nstate]=cost+ncost
+                queue[cost+ncost].append(nstate)
                 total += 1
-        done += len(queue[cost])
+            #print()
 
 maze = open("input/day23.txt").read().splitlines()
 
-state = []
-state.append(maze[1][1])
+z = []
+z.append(maze[1][1])
 for hp in range(1,6):
-    state.append(maze[1][2*hp])
-state.append(maze[1][11])
+    z.append(maze[1][2*hp])
+z.append(maze[1][11])
 for row in range(4):
     for line in range(4):
-        state.append(maze[line+2][3+row*2])
+        z.append(maze[line+2][3+row*2])
 
-search(state)
+search("".join(z))
