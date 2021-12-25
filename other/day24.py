@@ -1,31 +1,28 @@
-import itertools
-lines = open("input/day24.txt").read().splitlines()
-
 class Expr:
-    def __init__(self, value = 0, inputs = None, left = None):
+    def __init__(self, value=0, inputs=None, left=None):
         self.left = left
         self.inputs = inputs if inputs else []
         self.value = value
         self.base = 26
-    
+
     def min(self):
         if self.left:
             return self.left.min()*self.base+len(self.inputs)+self.value
         else:
             return len(self.inputs)+self.value
-    
+
     def max(self):
         if self.left:
             return self.left.max()*self.base+9*len(self.inputs)+self.value
         else:
             return 9*len(self.inputs)+self.value
-    
+
     def equals(self, val):
         if self.left or self.inputs:
             return self.min() == val and self.max() == val
         else:
             return self.value == val
-        
+
     def divX(self, val):
         if val == 1 or self.equals(0):
             return
@@ -41,11 +38,11 @@ class Expr:
     def divR(self, other):
         # This is only supported if the right side is a fixed value
         self.divX(other.value)
-    
+
     def modX(self, val):
         # check base?
         self.left = None
-    
+
     def mulX(self, val):
         if val == 1 or self.equals(0):
             return
@@ -65,13 +62,13 @@ class Expr:
         if self.left and other.left:
             self.left.addR(other.left)
         elif other.left:
-            self.left=other.left.copy()
+            self.left = other.left.copy()
         self.value += other.value
         self.inputs.extend(other.inputs)
- 
+
     def addV(self, val):
         self.value += val
-    
+
     def copy(self):
         if self.left:
             return Expr(self.value, self.inputs.copy(), self.left.copy())
@@ -79,7 +76,7 @@ class Expr:
             return Expr(self.value, self.inputs.copy())
 
     def str(self):
-        ret = ""       
+        ret = ""
         if self.left:
             ret = "({})*{}".format(self.left.str(), self.base)
         if len(self.inputs) > 0:
@@ -95,16 +92,17 @@ class Expr:
         else:
             return ret if ret else "0"
 
+
 class State:
     def __init__(self, entropy):
-        self.regs = {'w':Expr(), 'x': Expr(), 'y': Expr(), 'z': Expr()}
+        self.regs = {'w': Expr(), 'x': Expr(), 'y': Expr(), 'z': Expr()}
         self.entropy = entropy
         self.pos = 0
         self.conds = []
         pass
 
     def inp(self, dst):
-        self.regs[dst]=Expr(inputs=["inp[{}]".format(self.pos)])
+        self.regs[dst] = Expr(inputs=["inp[{}]".format(self.pos)])
         self.pos += 1
 
     def add(self, dst, var):
@@ -121,7 +119,7 @@ class State:
 
     def div(self, dst, var):
         self.regs[dst].divX(int(var))
-    
+
     def mod(self, dst, var):
         self.regs[dst].modX(int(var))
 
@@ -147,7 +145,8 @@ class State:
                 self.regs[dst] = Expr(0)
         return True
 
-for e in range(2,2**14,2):
+lines = open("input/day24.txt").read().splitlines()
+for e in range(2, 2**14, 2):
     st = State(e)
     valid = True
     for l in lines:
@@ -179,4 +178,4 @@ for e in range(2,2**14,2):
     for r in st.regs:
         print("{} = {}..{}".format(r, st.regs[r].min(), st.regs[r].max()))
         print()
-    break    
+    break
