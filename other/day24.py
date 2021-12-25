@@ -141,7 +141,7 @@ class State:
                 if self.regs[var].max() < self.regs[dst].min() or self.regs[dst].max() < self.regs[var].min():
                     self.regs[dst] = Expr(0)
                     return True
-                self.conds.append("{} != {}".format(self.regs[var], self.regs[dst]))
+                self.conds.append("{} != {}".format(self.regs[var].str(), self.regs[dst].str()))
                 self.regs[dst] = Expr(0)
         return True
 
