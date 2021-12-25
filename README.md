@@ -37,7 +37,7 @@ The simplest way to view them is on [YouTube](https://www.youtube.com/playlist?l
 If, however, you would like to run them, you will need to first get all the dependencies:
 
 ```
-$ pip install pygame numpy ffmpeg
+$ pip install pygame numpy ffmpeg-python
 ```
 
 * `pygame` is needed for all the display functions. 
